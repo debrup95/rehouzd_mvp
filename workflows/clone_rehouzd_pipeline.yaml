@@ -1,0 +1,72 @@
+resources:
+  jobs:
+    Clone_of_rehouizd_pipeline:
+      name: Clone of rehouizd_pipeline
+      tasks:
+        - task_key: brnz_prps_prop_sales_dtl
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/brnz_prps_prop_sales_dtl
+            base_parameters:
+              path_dst: /Volumes/rehouzd_db/bronze/bronze_volume/data_rehouzd_mvp/2025-05-11/12233813241773
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: slv_prps_prop_sales_dtl
+          depends_on:
+            - task_key: brnz_prps_prop_sales_dtl
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/slv_prps_prop_sales_dtl
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: slv_int_inv_dtl
+          depends_on:
+            - task_key: slv_prps_prop_sales_dtl
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/slvr_int_inv_dtl
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: process_slv_int_prp
+          depends_on:
+            - task_key: slv_int_inv_dtl
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/process_slv_int_prp
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: process_slv_int_pr_cmps
+          depends_on:
+            - task_key: process_slv_int_prp
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/process_slv_int_pr_cmps
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: prc_slv_int_prcl_sls_dlt_pl
+          depends_on:
+            - task_key: process_slv_int_pr_cmps
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/prc_slv_int_prcl_sls_dlt_pl
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+        - task_key: prc_slv_int_prop_sls_dlt_pl
+          depends_on:
+            - task_key: process_slv_int_pr_cmps
+          notebook_task:
+            notebook_path: /Workspace/Users/debrup.kar@outlook.com/rehouzd_code/prc_slv_int_prop_sls_dlt_pl
+            source: WORKSPACE
+          job_cluster_key: Job_cluster
+      job_clusters:
+        - job_cluster_key: Job_cluster
+          new_cluster:
+            cluster_name: ""
+            spark_version: 15.4.x-scala2.12
+            azure_attributes:
+              first_on_demand: 1
+              availability: SPOT_WITH_FALLBACK_AZURE
+              spot_bid_max_price: -1
+            node_type_id: Standard_D4ds_v5
+            spark_env_vars:
+              PYSPARK_PYTHON: /databricks/python3/bin/python3
+            enable_elastic_disk: true
+            data_security_mode: SINGLE_USER
+            runtime_engine: PHOTON
+            num_workers: 8
+      queue:
+        enabled: true

@@ -1,0 +1,8 @@
+{
+  "jdbc_url":"jdbc:postgresql://postgresql-rehouzed.postgres.database.azure.com:5432/postgres",
+  "connection_properties" : {
+    "user": "rehouzedadmin",
+    "password": "admin123$",
+    "driver": "org.postgresql.Driver"
+  }
+}
